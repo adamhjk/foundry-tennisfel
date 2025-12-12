@@ -1,0 +1,63 @@
+{
+  "id": "tennisfel",
+  "name": "tennisfel",
+  "title": "Tennisfel World Module",
+  "description": "A comprehensive world module for Tennisfel, converted from LegendKeeper data. Includes scenes, actors, items, and extensive journal entries covering the lore, history, and mythology of the Tennisfel world.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "author": "Adam Jacob",
+  "url": "https://github.com/adamhjk/foundry-tennisfel",
+  "manifest": "https://raw.githubusercontent.com/adamhjk/foundry-tennisfel/main/module.json",
+  "download": "https://github.com/adamhjk/foundry-tennisfel/archive/refs/tags/v0.1.0.zip",
+  "bugs": "https://github.com/adamhjk/foundry-tennisfel/issues",
+  "readme": "https://github.com/adamhjk/foundry-tennisfel/README.md",
+  "packs": [
+    {
+      "name": "tennisfel-scenes",
+      "label": "Tennisfel Scenes",
+      "path": "packs/tennisfel-scenes.db",
+      "type": "Scene",
+      "system": "",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "tennisfel-actors",
+      "label": "Tennisfel Actors",
+      "path": "packs/tennisfel-actors.db",
+      "type": "Actor",
+      "system": "",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "tennisfel-items",
+      "label": "Tennisfel Items",
+      "path": "packs/tennisfel-items.db",
+      "type": "Item",
+      "system": "",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "tennisfel-journal",
+      "label": "Tennisfel Journal",
+      "path": "packs/tennisfel-journal.db",
+      "type": "JournalEntry",
+      "system": "",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ]
+}
