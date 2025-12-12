@@ -26,34 +26,25 @@ This module provides a complete campaign setting with:
 
 ## What's Included
 
-The module contains 100 converted resources from LegendKeeper, organized into four compendium packs:
+The module contains 80 converted resources from LegendKeeper, organized into two compendium packs:
+
+### Tennisfel Journal
+Extensive world documentation including:
+- **Characters & NPCs**: Player characters, important NPCs, and creatures with full biographies
+- **Items & Artifacts**: Magical artifacts, equipment, and technology
+- **Lore**: World mythology and legends
+- **History**: Timeline and historical events
+- **Geography**: Locations and settlements
+- **Organizations**: Factions and groups
+- **Adventures**: Campaign sessions and story arcs
+- **Procedures**: Game mechanics and guides
+- All with embedded images and cross-references
 
 ### Tennisfel Scenes
 Maps and environments including:
 - The Tennisfel Region Map
 - Location-specific maps with pins and notes
-
-### Tennisfel Actors
-Characters, NPCs, and creatures including:
-- Player characters
-- Important NPCs
-- Creatures and monsters
-- Each with full biography and portraits (where available)
-
-### Tennisfel Items
-Artifacts, equipment, and technology:
-- Magical artifacts
-- Technological items
-- Equipment with full descriptions
-
-### Tennisfel Journal
-Extensive world documentation including:
-- **Lore**: World mythology and legends
-- **History**: Timeline and historical events
-- **Geography**: Locations and settlements
-- **Organizations**: Factions and groups
-- **Procedures**: Game mechanics and guides
-- All with embedded images and cross-references
+- 13 scenes ready for your game
 
 ## Features
 
@@ -67,7 +58,9 @@ Extensive world documentation including:
 
 1. Enable the module in your world
 2. Open the Compendium sidebar
-3. Browse the four Tennisfel compendium packs
+3. Browse the two Tennisfel compendium packs:
+   - **Tennisfel Journal** - Characters, items, lore, locations, and documentation
+   - **Tennisfel Scenes** - Maps and environments
 4. Drag and drop content into your world as needed
 
 ## Development
@@ -104,9 +97,9 @@ The `convert.py` script handles:
 ## Data Source
 
 This module was converted from a LegendKeeper export containing:
-- 100 resources
-- 40+ images
-- Comprehensive world documentation
+- 80 resources
+- 10 images
+- Comprehensive world documentation including characters, locations, lore, and adventures
 
 ## Credits
 
@@ -127,8 +120,9 @@ For issues or questions:
 ## Changelog
 
 ### Version 0.1.0 (Initial Release)
-- Converted 100 LegendKeeper resources
-- 4 compendium packs (Scenes, Actors, Items, Journal Entries)
-- Downloaded and integrated all images
-- Full Prosemirror to HTML conversion
+- Converted 80 LegendKeeper resources
+- 2 compendium packs (Scenes and Journal Entries)
+- All content as journal entries: characters, NPCs, creatures, items, artifacts, lore, and documentation
+- Downloaded and integrated 10 images
+- Full Prosemirror to HTML conversion with embedded images
 - Foundry VTT v12 compatible

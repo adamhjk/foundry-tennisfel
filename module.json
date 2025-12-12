@@ -27,28 +27,6 @@
       }
     },
     {
-      "name": "tennisfel-actors",
-      "label": "Tennisfel Actors",
-      "path": "packs/tennisfel-actors.db",
-      "type": "Actor",
-      "system": "",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      }
-    },
-    {
-      "name": "tennisfel-items",
-      "label": "Tennisfel Items",
-      "path": "packs/tennisfel-items.db",
-      "type": "Item",
-      "system": "",
-      "ownership": {
-        "PLAYER": "OBSERVER",
-        "ASSISTANT": "OWNER"
-      }
-    },
-    {
       "name": "tennisfel-journal",
       "label": "Tennisfel Journal",
       "path": "packs/tennisfel-journal.db",

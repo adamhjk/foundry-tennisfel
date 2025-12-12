@@ -188,32 +188,13 @@ def convert_prosemirror_to_html(content, image_map):
 
 def classify_resource(resource):
     """Determine what type of Foundry document this resource should become."""
-    name = resource.get('name', '').lower()
-    tags = [tag.lower() for tag in resource.get('tags', [])]
-
-    # Check for character names (has player name in parens)
-    if '(' in name and ')' in name:
-        return 'Actor'
-
-    # Check resource tags
-    if 'creature' in tags or 'npc' in tags:
-        return 'Actor'
-
-    if 'creature' in name or 'npc' in name:
-        return 'Actor'
-
-    if 'artifact' in tags or 'technology' in tags or 'item' in tags:
-        return 'Item'
-
-    if 'artifact' in name or 'technology' in name:
-        return 'Item'
-
-    # Check for map documents
+    # Check for map documents (Scenes)
     for doc in resource.get('documents', []):
         if doc.get('type') == 'map':
             return 'Scene'
 
-    # Default: Journal entry for lore/documentation
+    # Default: Everything else becomes a Journal entry
+    # (including characters, NPCs, creatures, items, artifacts, etc.)
     return 'JournalEntry'
 
 
@@ -507,8 +488,6 @@ def main():
     # Classify and convert resources
     print("\n5. Converting resources...")
     journal_entries = []
-    actors = []
-    items = []
     scenes = []
 
     for idx, resource in enumerate(resources, 1):
@@ -520,12 +499,6 @@ def main():
         if doc_type == 'JournalEntry':
             entry = create_journal_entry(resource, image_map)
             journal_entries.append(entry)
-        elif doc_type == 'Actor':
-            entry = create_actor_entry(resource, image_map)
-            actors.append(entry)
-        elif doc_type == 'Item':
-            entry = create_item_entry(resource, image_map)
-            items.append(entry)
         elif doc_type == 'Scene':
             entry = create_scene_entry(resource, image_map)
             scenes.append(entry)
@@ -533,15 +506,11 @@ def main():
     # Write compendium packs
     print("\n6. Writing compendium packs...")
     write_db_file('tennisfel-journal.db', journal_entries)
-    write_db_file('tennisfel-actors.db', actors)
-    write_db_file('tennisfel-items.db', items)
     write_db_file('tennisfel-scenes.db', scenes)
 
     print("\n" + "=" * 50)
     print("Conversion complete!")
     print(f"  - Journal Entries: {len(journal_entries)}")
-    print(f"  - Actors: {len(actors)}")
-    print(f"  - Items: {len(items)}")
     print(f"  - Scenes: {len(scenes)}")
     print(f"  - Images downloaded: {len(image_map)}")
     print("=" * 50)
