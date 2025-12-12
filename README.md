@@ -42,15 +42,19 @@ Extensive world documentation including:
 
 ### Tennisfel Scenes
 Maps and environments including:
-- The Tennisfel Region Map
-- Location-specific maps with pins and notes
-- 13 scenes ready for your game
+- The Hollow Throne (Malthulis HQ)
+- Parraldea
+- Tennisfel
+- Belphegor
+- Map to the Mokab
+- Lusty Maiden
+- 6 scenes with unique maps ready for your game
 
 ## Features
 
 - **Rich Content**: Converted from LegendKeeper with preserved formatting
 - **Images**: All assets downloaded and included locally
-- **Cross-References**: Resource links maintained between entries
+- **Cross-References**: Resource links converted to Foundry UUID format for seamless navigation between entries
 - **Secrets**: GM-only content preserved in journal entries
 - **System Agnostic**: Works with any game system in Foundry VTT v12
 
@@ -98,7 +102,7 @@ The `convert.py` script handles:
 
 This module was converted from a LegendKeeper export containing:
 - 80 resources
-- 10 images
+- 16 images (6 map images + 10 content images)
 - Comprehensive world documentation including characters, locations, lore, and adventures
 
 ## Credits
@@ -121,8 +125,8 @@ For issues or questions:
 
 ### Version 0.1.0 (Initial Release)
 - Converted 80 LegendKeeper resources
-- 2 compendium packs (Scenes and Journal Entries)
+- 2 compendium packs (6 Scenes with unique maps + 74 Journal Entries)
 - All content as journal entries: characters, NPCs, creatures, items, artifacts, lore, and documentation
-- Downloaded and integrated 10 images
+- Downloaded and integrated 16 images including map backgrounds
 - Full Prosemirror to HTML conversion with embedded images
 - Foundry VTT v12 compatible

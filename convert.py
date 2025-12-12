@@ -54,6 +54,9 @@ def collect_image_urls(data):
             # Check for URL keys
             if 'url' in obj and isinstance(obj['url'], str) and 'assets.legendkeeper.com' in obj['url']:
                 urls.add(obj['url'])
+            # Check for mapId keys (map document images)
+            if 'mapId' in obj and isinstance(obj['mapId'], str) and 'assets.legendkeeper.com' in obj['mapId']:
+                urls.add(obj['mapId'])
             # Recurse into dict values
             for value in obj.values():
                 extract_urls(value)
@@ -66,10 +69,13 @@ def collect_image_urls(data):
     return urls
 
 
-def convert_prosemirror_to_html(content, image_map):
+def convert_prosemirror_to_html(content, image_map, resource_id_map=None):
     """Convert Prosemirror/TipTap JSON to HTML."""
     if not content or not isinstance(content, dict):
         return ""
+
+    if resource_id_map is None:
+        resource_id_map = {}
 
     def process_node(node):
         if not isinstance(node, dict):
@@ -169,7 +175,16 @@ def convert_prosemirror_to_html(content, image_map):
             # LegendKeeper mentions/links to other resources
             mention_text = attrs.get('text', '')
             resource_id = attrs.get('id', '')
-            html = f'<a href="#" data-resource-id="{resource_id}">{mention_text}</a>'
+
+            # Convert to Foundry UUID format if we have the mapping
+            if resource_id in resource_id_map:
+                mapping = resource_id_map[resource_id]
+                foundry_id = mapping['id']
+                doc_type = mapping['type']
+                html = f'@UUID[{doc_type}.{foundry_id}]{{{mention_text}}}'
+            else:
+                # Fallback if resource not found
+                html = mention_text
 
         elif node_type == 'inlineExtension':
             # Inline extensions like icons
@@ -191,14 +206,27 @@ def classify_resource(resource):
     # Check for map documents (Scenes)
     for doc in resource.get('documents', []):
         if doc.get('type') == 'map':
-            return 'Scene'
+            # Check if the map document has a mapId (the actual map image)
+            map_data = doc.get('map', {})
+            map_id = map_data.get('mapId', '')
+            if map_id and map_id.startswith('http'):
+                return 'Scene'
+
+            # Also check IMAGE properties as fallback
+            for prop in resource.get('properties', []):
+                if prop.get('type') == 'IMAGE':
+                    url = prop.get('data', {}).get('url', '')
+                    if url and url.startswith('http'):
+                        return 'Scene'
+            # If no image URL, treat as journal entry
+            break
 
     # Default: Everything else becomes a Journal entry
     # (including characters, NPCs, creatures, items, artifacts, etc.)
     return 'JournalEntry'
 
 
-def create_journal_entry(resource, image_map):
+def create_journal_entry(resource, image_map, resource_id_map=None):
     """Convert a LegendKeeper resource into a Foundry JournalEntry."""
     resource_id = generate_id()
     name = resource.get('name', 'Untitled')
@@ -212,7 +240,7 @@ def create_journal_entry(resource, image_map):
             page_name = doc.get('name', 'Main')
             content = doc.get('content', {})
 
-            html_content = convert_prosemirror_to_html(content, image_map)
+            html_content = convert_prosemirror_to_html(content, image_map, resource_id_map)
 
             page = {
                 "_id": page_id,
@@ -380,16 +408,22 @@ def create_scene_entry(resource, image_map):
             map_doc = doc
             break
 
-    # Default background
-    background_src = "modules/tennisfel/assets/maps/tennisfel-region-map.webp"
+    # Get the map image URL - first check the map document's mapId
+    background_src = None
+    if map_doc:
+        map_data = map_doc.get('map', {})
+        map_url = map_data.get('mapId', '')
+        if map_url and map_url in image_map:
+            background_src = image_map[map_url]
 
-    # Check for IMAGE property that might be the map
-    for prop in resource.get('properties', []):
-        if prop.get('type') == 'IMAGE':
-            url = prop.get('data', {}).get('url', '')
-            if url and url in image_map:
-                background_src = image_map[url]
-                break
+    # If not found, check IMAGE properties as fallback
+    if not background_src:
+        for prop in resource.get('properties', []):
+            if prop.get('type') == 'IMAGE':
+                url = prop.get('data', {}).get('url', '')
+                if url and url in image_map:
+                    background_src = image_map[url]
+                    break
 
     scene = {
         "_id": scene_id,
@@ -462,13 +496,27 @@ def main():
 
     print("\n3. Downloading images...")
     image_map = {}
+
+    # First, identify which URLs are map images
+    map_urls = set()
+    for resource in resources:
+        for doc in resource.get('documents', []):
+            if doc.get('type') == 'map':
+                map_data = doc.get('map', {})
+                map_id = map_data.get('mapId', '')
+                if map_id:
+                    map_urls.add(map_id)
+
     for idx, url in enumerate(image_urls, 1):
         print(f"   [{idx}/{len(image_urls)}] ", end='')
 
         # Determine category based on context
-        category = 'images'
-        if '/banner' in url.lower():
+        if url in map_urls:
+            category = 'maps'
+        elif '/banner' in url.lower():
             category = 'banners'
+        else:
+            category = 'images'
 
         local_path = download_image(url, category)
         if local_path:
@@ -485,26 +533,53 @@ def main():
         shutil.copy(region_map_src, 'assets/maps/tennisfel-region-map.webp')
         print("   Region map copied successfully")
 
-    # Classify and convert resources
-    print("\n5. Converting resources...")
+    # First pass: Build resource ID mapping
+    print("\n5. Building resource ID map...")
+    resource_id_map = {}
+    resource_foundry_ids = {}
+
+    for resource in resources:
+        legendkeeper_id = resource.get('id', '')
+        foundry_id = generate_id()
+        doc_type = classify_resource(resource)
+        resource_id_map[legendkeeper_id] = {
+            'id': foundry_id,
+            'type': doc_type
+        }
+        resource_foundry_ids[legendkeeper_id] = {
+            'foundry_id': foundry_id,
+            'resource': resource,
+            'doc_type': doc_type
+        }
+
+    print(f"   Created ID mapping for {len(resource_id_map)} resources")
+
+    # Second pass: Convert resources with proper UUID links
+    print("\n6. Converting resources...")
     journal_entries = []
     scenes = []
 
-    for idx, resource in enumerate(resources, 1):
+    for idx, (legendkeeper_id, data) in enumerate(resource_foundry_ids.items(), 1):
+        resource = data['resource']
+        foundry_id = data['foundry_id']
+        doc_type = data['doc_type']
         name = resource.get('name', 'Untitled')
-        doc_type = classify_resource(resource)
 
         print(f"   [{idx}/{len(resources)}] {name} -> {doc_type}")
 
         if doc_type == 'JournalEntry':
-            entry = create_journal_entry(resource, image_map)
+            entry = create_journal_entry(resource, image_map, resource_id_map)
+            # Override the generated ID with the pre-assigned one
+            entry['_id'] = foundry_id
             journal_entries.append(entry)
         elif doc_type == 'Scene':
             entry = create_scene_entry(resource, image_map)
+            # Override the generated ID with the pre-assigned one
+            entry['_id'] = foundry_id
             scenes.append(entry)
 
     # Write compendium packs
-    print("\n6. Writing compendium packs...")
+    print("\n7. Writing compendium packs...")
     write_db_file('tennisfel-journal.db', journal_entries)
     write_db_file('tennisfel-scenes.db', scenes)
 
